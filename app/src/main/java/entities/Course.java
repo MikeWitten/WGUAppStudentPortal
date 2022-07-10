@@ -96,11 +96,6 @@ public class Course {
 
     @Override
     public String toString() {
-        return "Course{" +
-                "courseName='" + courseName + '\'' +
-                ", startDate=" + startDate.format(DateTimeFormatter.ISO_LOCAL_DATE) +
-                ", endDate=" + endDate.format(DateTimeFormatter.ISO_LOCAL_DATE) +
-                ", status=" + status.toString() +
-                '}';
+        return this.courseName;
     }
 }

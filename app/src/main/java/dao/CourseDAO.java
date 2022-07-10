@@ -18,6 +18,12 @@ public interface CourseDAO {
     @Query("DELETE FROM courses")
     void deleteAllRows();
 
+    @Query("SELECT courseName FROM courses")
+    String[] getCoursesArray();
+
+    @Query("SELECT courseID FROM courses WHERE courseName IS :inputName")
+    Integer getClassID(String inputName);
+
     @Insert
     void insertAll(Course... courses);
 

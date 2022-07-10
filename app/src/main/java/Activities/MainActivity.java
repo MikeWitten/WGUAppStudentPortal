@@ -1,12 +1,12 @@
 package Activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.wittenPortfolio.R;
 
@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void toAssessmentsView(View view) {
+        Intent intent = new Intent(MainActivity.this, AssessmentList.class);
+        startActivity(intent);
     }
 
     public void toMentorsView(View view) {
@@ -53,9 +55,8 @@ public class MainActivity extends AppCompatActivity {
         AppDatabase db= AppDatabase.getDbInstance(this.getApplicationContext());
         //empty database
         db.clearAllTables();
-        //take a break for the system to catch up.
-        Thread.sleep(500);
 
+        //Create test data.
         LocalDate firstStart= LocalDate.of(2001,1,1);
         LocalDate firstEnd=LocalDate.of(2001,12,31);
         LocalDate secondStart= LocalDate.of(2002,1,1);
@@ -116,9 +117,11 @@ public class MainActivity extends AppCompatActivity {
 
         Assessment eee = new Assessment(null, 9, "Manly Grooming Exam",
                 AssessmentType.Test, thirdStart, thirdEnd);
-        Assessment fff = new Assessment(null, 9, "Project: Women Beards(inclusion matters)",
-                AssessmentType.Project, thirdStart, thirdEnd);
+        Assessment fff = new Assessment(null, 9,
+                "Project: Women and Beards(inclusion matters)", AssessmentType.Project,
+                thirdStart, thirdEnd);
 
+        //Add test data to the database.
         db.courseDAO().insertAll(aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm);
         db.AssessmentDAO().insertAll(aaa,bbb,ccc,ddd,eee,fff);
         db.termDAO().insertAll(a,b,c,d);
