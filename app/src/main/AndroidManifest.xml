@@ -14,6 +14,10 @@
         android:theme="@style/Theme.WGUAppStudentPortal"
         tools:targetApi="31">
         <activity
+            android:name="Activities.AssessmentDetail"
+            android:exported="false"
+            android:parentActivityName="Activities.AssessmentList"/>
+        <activity
             android:name="Activities.AddAssessmentActivity"
             android:exported="false"
             android:parentActivityName="Activities.AssessmentList" />

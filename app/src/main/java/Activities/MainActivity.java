@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
         Assessment aaa = new Assessment(null, 1, "Wands Exam",
                 AssessmentType.Test, firstStart, firstEnd);
-        Assessment bbb = new Assessment(null, 1, "Paper: White privilege for orphans",
+        Assessment bbb = new Assessment(null, 1, "Paper: 'White privilege for magical orphans'",
                 AssessmentType.Paper, firstStart, firstEnd);
         Assessment ccc = new Assessment(null, 1, "Project: Make a magical Friend",
                 AssessmentType.Project, firstStart, firstEnd);

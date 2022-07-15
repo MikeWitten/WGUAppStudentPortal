@@ -1,45 +1,26 @@
 package Activities;
 
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentActivity;
-
 import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.os.FileObserver;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ListAdapter;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.wittenPortfolio.R;
 
-import java.sql.SQLOutput;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Objects;
 
 import database.AppDatabase;
 import entities.Assessment;
 import entities.AssessmentType;
-import entities.Course;
 
 public class AddAssessmentActivity extends AppCompatActivity {
     Integer assID;
@@ -71,80 +52,35 @@ public class AddAssessmentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_assessment);
+        //This line creates a back button.
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        //Get an instance of the database.
         db = AppDatabase.getDbInstance(this.getApplicationContext());
-
-        courseSelectBTN = findViewById(R.id.courseSelectBTN);
-
-        courses = db.courseDAO().getCoursesArray();
-        types = getResources().getStringArray(R.array.assessment_types_array);
+        //Define the edit text field.
         title = findViewById(R.id.assessmentTitleInput);
-        selectType = findViewById(R.id.typeSelectBTN);
+        //Populate the 'Course Select' spinner.
+        courseSpinnerPopulate();
+        //Populate the 'Assessment Type' spinner.
+        typeSpinnerPopulate();
+        //Set up the date-picker for the start date.
+        startDatePicker();
+        //Set up the date-picker for the end date.
+        endDatePicker();
 
-        ad2 = new AlertDialog.Builder(AddAssessmentActivity.this).setSingleChoiceItems(types, selected2,
-                (dialog, which) -> {
-                    selectType.setText(types[which]);
-                    selected2 = which;
-                    ad2.dismiss();
-                }).setTitle("Choose an Assessment Type").create();
-        selectType.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ad2.getListView().setSelection(selected2);
-                ad2.show();
-            }
-        });
+    }
 
-        ad = new AlertDialog.Builder(AddAssessmentActivity.this).setSingleChoiceItems(courses, selected,
-                (dialog, which) -> {
-                    courseSelectBTN.setText(courses[which]);
-                    selected = which;
-                    ad.dismiss();
-
-                }).setTitle("Choose A Course").create();
-
-        courseSelectBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ad.getListView().setSelection(selected);
-                ad.show();
-
-            }
-        });
-
-        //set up datepicker.
-        startSelectButton = findViewById(R.id.startSelectBTN);
+    private void endDatePicker() {
         endSelectButton = findViewById(R.id.endSelectBTN);
-
-        startSelectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Calendar calendar = Calendar.getInstance();
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
-                int month = calendar.get(Calendar.MONTH);
-                int year = calendar.get(Calendar.YEAR);
-
-                //Date picker
-                picker = new DatePickerDialog(AddAssessmentActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        startDate = LocalDate.of(year, month + 1, dayOfMonth);
-                        startSelectButton.setText((month + 1) + "/" + dayOfMonth + "/" + year);
-                    }
-                }, year, month, day);
-                picker.show();
-            }
-        });
-
+        //Create an on click listener.
         endSelectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Set values for the calendar.
                 myCalendar = Calendar.getInstance();
                 int day = myCalendar.get(Calendar.DAY_OF_MONTH);
                 int month = myCalendar.get(Calendar.MONTH);
                 int year = myCalendar.get(Calendar.YEAR);
-
-                //Date picker
+                //Create a date-picker dialog.
                 picker = new DatePickerDialog(AddAssessmentActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -157,6 +93,72 @@ public class AddAssessmentActivity extends AppCompatActivity {
         });
     }
 
+    private void startDatePicker() {
+        startSelectButton = findViewById(R.id.startSelectBTN);
+        //Set an on click listener.
+        startSelectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Set values for the calendar.
+                final Calendar calendar = Calendar.getInstance();
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                int month = calendar.get(Calendar.MONTH);
+                int year = calendar.get(Calendar.YEAR);
+                //Create a date picker dialog.
+                picker = new DatePickerDialog(AddAssessmentActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        startDate = LocalDate.of(year, month + 1, dayOfMonth);
+                        startSelectButton.setText((month + 1) + "/" + dayOfMonth + "/" + year);
+                    }
+                }, year, month, day);
+                picker.show();
+            }
+        });
+    }
+
+    private void typeSpinnerPopulate() {
+        selectType = findViewById(R.id.typeSelectBTN);
+        //Get an array of strings from resources.
+        types = getResources().getStringArray(R.array.assessment_types_array);
+        //Create a dialog.
+        ad2 = new AlertDialog.Builder(AddAssessmentActivity.this).setSingleChoiceItems(types, selected2,
+                (dialog, which) -> {
+                    selectType.setText(types[which]);
+                    selected2 = which;
+                    ad2.dismiss();
+                }).setTitle("Choose an Assessment Type").create();
+        //Create an on click listener.
+        selectType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ad2.getListView().setSelection(selected2);
+                ad2.show();
+            }
+        });
+
+    }
+
+    private void courseSpinnerPopulate() {
+        courseSelectBTN = findViewById(R.id.courseSelectBTN);
+        //Get course array from the database.
+        courses = db.courseDAO().getCoursesArray();
+        //Create a dialog.
+        ad = new AlertDialog.Builder(AddAssessmentActivity.this).setSingleChoiceItems(courses, selected,
+                (dialog, which) -> {
+                    courseSelectBTN.setText(courses[which]);
+                    selected = which;
+                    ad.dismiss();
+                }).setTitle("Choose A Course").create();
+        //Create an on click listener.
+        courseSelectBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ad.getListView().setSelection(selected);
+                ad.show();
+            }
+        });
+    }
 
     public void addAssessmentToDatabase(View view) {
         assID = null;

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 
 import com.wittenPortfolio.R;
@@ -18,8 +19,9 @@ import adapters.AssessmentListAdapter;
 import database.AppDatabase;
 import entities.Assessment;
 
-public class AssessmentList extends AppCompatActivity {
+public class AssessmentList extends AppCompatActivity implements AssessmentListAdapter.OnAssessmentListener {
     private AssessmentListAdapter assessmentListAdapter;
+    List<Assessment> assessments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +29,10 @@ public class AssessmentList extends AppCompatActivity {
         setContentView(R.layout.activity_assessment_list);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         AppDatabase db = AppDatabase.getDbInstance(this.getApplicationContext());
-        List<Assessment> assessments = db.AssessmentDAO().getAllAssessments();
+        assessments = db.AssessmentDAO().getAllAssessments();
 
         initRecyclerView();
-        assessmentListAdapter.setAssessmentList(assessments);
+
     }
 
     private void initRecyclerView() {
@@ -38,12 +40,23 @@ public class AssessmentList extends AppCompatActivity {
         rcView.setLayoutManager(new LinearLayoutManager(this));
         DividerItemDecoration decoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         rcView.addItemDecoration(decoration);
-        assessmentListAdapter = new AssessmentListAdapter(this);
+        assessmentListAdapter = new AssessmentListAdapter(this, assessments, this);
         rcView.setAdapter(assessmentListAdapter);
+
     }
 
     public void toAddAssessmentView(View view) {
         Intent intent = new Intent(AssessmentList.this, AddAssessmentActivity.class);
+        startActivity(intent);
+    }
+
+
+    @Override
+    public void onAssessmentClick(int position) {
+        Assessment a = assessments.get(position);
+        System.out.println("title = " + a.assTitle);
+        Intent intent = new Intent(AssessmentList.this, AssessmentDetail.class);
+        intent.putExtra ("assessment", a);
         startActivity(intent);
     }
 }
